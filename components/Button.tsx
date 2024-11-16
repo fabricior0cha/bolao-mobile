@@ -2,27 +2,42 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { TouchableOpacityProps } from "react-native-gesture-handler";
 type Props = {
+  type: "primary" | "secondary";
   children: React.ReactNode;
 } & TouchableOpacityProps;
 
 export default function Button(props: Props) {
+  const style = styles(props.type);
+
   return (
-    <TouchableOpacity style={styles.button} {...props}>
-      <Text style={styles.buttonText}>{props.children}</Text>
+    <TouchableOpacity style={style.button} {...props}>
+      <Text style={style.buttonText}>{props.children}</Text>
     </TouchableOpacity>
   );
 }
 
-const styles = StyleSheet.create({
-  button: {
-    backgroundColor: "#047C3F",
-    paddingVertical: 15,
-    borderRadius: 8,
-    alignItems: "center",
+const colors = {
+  background: {
+    primary: "#047C3F",
+    secondary: "#F7DD43",
   },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    textTransform: "uppercase",
+  text: {
+    primary: "#FFF",
+    secondary: "#000",
   },
-});
+};
+
+const styles = (type: "primary" | "secondary" = "primary") =>
+  StyleSheet.create({
+    button: {
+      backgroundColor: colors.background[type],
+      paddingVertical: 15,
+      borderRadius: 8,
+      alignItems: "center",
+    },
+    buttonText: {
+      color: colors.text[type],
+      fontSize: 16,
+      textTransform: "uppercase",
+    },
+  });

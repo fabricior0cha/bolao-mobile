@@ -1,3 +1,6 @@
+import Button from "@/components/Button";
+import Input from "@/components/Input";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -13,34 +16,32 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
 
   const handleSignUp = () => {
-    console.log("Nome:", name, "Email:", email, "Senha:", password);
+    router.push("/criar-conta");
   };
 
   return (
     <View style={styles.container}>
       <Image
-        source={require("../assets/logo.png")}
+        source={require("../assets/bolao.png")}
         style={{ width: 320, height: 250, alignSelf: "center" }}
       />
-      <Text style={styles.title}>Login</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
+      <Input
+        placeholder="E-mail"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      <TextInput
-        style={styles.input}
+      <Input
         placeholder="Senha"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
-      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
+      <Button type="primary">Login</Button>
+      <Button type="secondary" onPress={handleSignUp}>
+        Criar conta
+      </Button>
     </View>
   );
 }
@@ -49,32 +50,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
+    backgroundColor: "#121214",
+    display: "flex",
+    gap: 15,
     // justifyContent: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  input: {
-    height: 50,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-  },
-  button: {
-    backgroundColor: "#007bff",
-    paddingVertical: 15,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
   },
 });

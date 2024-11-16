@@ -35,8 +35,9 @@ export default function RootLayout() {
 
   return (
     <Stack>
-      <Stack.Screen name="criar-conta" />
-      <Stack.Screen name="login" />
+      <Stack.Screen name="criar-conta" options={{ headerShown: false }} />
+      <Stack.Screen name="login" options={{ headerShown: false }} />
+      <Stack.Screen name="home" options={{ headerShown: false }} />
     </Stack>
   );
 }

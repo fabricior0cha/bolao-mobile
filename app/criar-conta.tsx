@@ -20,6 +20,10 @@ export default function CriarContaScreen() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
+  const handleLogin = () => {
+    router.push("/login");
+  };
+
   const handleCreateAccount = async () => {
     axios
       .post("http://192.168.1.103:8080/api/usuarios", {
@@ -37,15 +41,31 @@ export default function CriarContaScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Input placeholder="Nome" value={nome} onChangeText={setNome} />
-      <Input placeholder="E-mail" value={email} onChangeText={setEmail} />
-      <Input
-        placeholder="Senha"
-        value={senha}
-        onChangeText={setSenha}
-        secureTextEntry
+      <Image
+        source={require("../assets/bolao.png")}
+        style={{
+          width: 320,
+          height: 250,
+          alignSelf: "center",
+        }}
       />
-      <Button onPress={handleCreateAccount}>Criar conta</Button>
+      <View style={styles.form}>
+        <Input placeholder="Nome" value={nome} onChangeText={setNome} />
+        <Input placeholder="E-mail" value={email} onChangeText={setEmail} />
+        <Input
+          placeholder="Senha"
+          value={senha}
+          onChangeText={setSenha}
+          secureTextEntry
+        />
+        <Button onPress={handleCreateAccount} type="primary">
+          Criar conta
+        </Button>
+
+        <Button onPress={handleLogin} type="secondary">
+          Login
+        </Button>
+      </View>
     </SafeAreaView>
   );
 }
@@ -55,7 +75,13 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "#121214",
+
     // justifyContent: "center",
+  },
+  form: {
+    display: "flex",
+    gap: 15,
+    padding: 20,
   },
   title: {
     fontSize: 24,
