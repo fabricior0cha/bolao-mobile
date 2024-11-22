@@ -4,40 +4,56 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { router, Stack } from "expo-router";
+import { router, Stack, Tabs } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { createContext, useEffect, useState } from "react";
 import "react-native-reanimated";
 
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { FontAwesome } from "@expo/vector-icons";
+import { ContextProvider } from "@/components/Context";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { StyleSheet } from "react-native";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+  });
+
+  const [usuario, setUsuario] = useState(null);
+  const Context = createContext({
+    usuario,
+    setUsuario,
   });
 
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
-      router.navigate("./criar-conta");
+      router.push("/login");
     }
   }, [loaded]);
-
-  useEffect(() => {}, []);
 
   if (!loaded) {
     return null;
   }
 
   return (
-    <Stack>
-      <Stack.Screen name="criar-conta" options={{ headerShown: false }} />
-      <Stack.Screen name="login" options={{ headerShown: false }} />
-      <Stack.Screen name="home" options={{ headerShown: false }} />
-    </Stack>
+    <ContextProvider>
+      <SafeAreaView style={styles.container}>
+        <Stack>
+          <Stack.Screen name="criar-conta" options={{ headerShown: false }} />
+          <Stack.Screen name="login" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+      </SafeAreaView>
+    </ContextProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

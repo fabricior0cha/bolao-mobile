@@ -1,57 +1,51 @@
 import Button from "@/components/Button";
+import { useUsuarioContext } from "@/components/Context";
 import Input from "@/components/Input";
-import { router } from "expo-router";
-import React, { useState } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  Alert,
-  ToastAndroid,
-  SafeAreaView,
-} from "react-native";
 import axios from "axios";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useState } from "react";
+import { Alert, StyleSheet, View } from "react-native";
 
-export default function CriarContaScreen() {
+function Perfil() {
+  const { usuario } = useUsuarioContext();
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
-  const handleLogin = () => {
-    router.push("/login");
+  const handleGetUsuario = async () => {
+    axios
+      .get(`http://localhost:8080/api/usuarios/${usuario?.id}`)
+      .then((resp) => {
+        setNome(resp.data.nome);
+        setEmail(resp.data.email);
+        setSenha(resp.data.senha ?? "");
+      });
   };
 
-  const handleCreateAccount = async () => {
+  const handleUpdateUsuario = async () => {
     axios
-      .post("http://192.168.1.103:8080/api/usuarios", {
+      .put(`http://localhost:8080/api/usuarios`, {
+        id: usuario?.id,
         nome,
         email,
         senha,
       })
       .then(() => {
-        Alert.alert(
-          "Conta criada com sucesso! Faça login para acessar sua conta."
-        );
-        router.push("/login");
+        Alert.alert("Usuário atualizado com sucesso!");
       })
       .catch((error) => {
         Alert.alert(error.response.data.message);
       });
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      handleGetUsuario();
+    }, [])
+  );
+
   return (
     <View style={styles.container}>
-      <Image
-        source={require("../assets/bolao.png")}
-        style={{
-          width: 320,
-          height: 250,
-          alignSelf: "center",
-        }}
-      />
       <View style={styles.form}>
         <Input placeholder="Nome" value={nome} onChangeText={setNome} />
         <Input placeholder="E-mail" value={email} onChangeText={setEmail} />
@@ -61,12 +55,8 @@ export default function CriarContaScreen() {
           onChangeText={setSenha}
           secureTextEntry
         />
-        <Button onPress={handleCreateAccount} type="primary">
-          Criar conta
-        </Button>
-
-        <Button onPress={handleLogin} type="secondary">
-          Login
+        <Button type="secondary" onPress={handleUpdateUsuario}>
+          Alterar
         </Button>
       </View>
     </View>
@@ -78,6 +68,8 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "#121214",
+    display: "flex",
+    gap: 15,
   },
   form: {
     display: "flex",
@@ -85,3 +77,5 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 });
+
+export default Perfil;

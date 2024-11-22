@@ -1,5 +1,7 @@
 import Button from "@/components/Button";
+import { useUsuarioContext } from "@/components/Context";
 import Input from "@/components/Input";
+import axios from "axios";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -9,13 +11,30 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [senha, setSenha] = useState("");
+  const { setUsuario } = useUsuarioContext();
 
-  const handleSignUp = () => {
+  const handleLogin = () => {
+    axios
+      .post("http://localhost:8080/api/login", {
+        email,
+        senha,
+      })
+      .then((resp) => {
+        setUsuario(resp.data);
+        router.push("/boloes");
+      })
+      .catch((error) => {
+        Alert.alert(error.response.data.message);
+      });
+  };
+
+  const handleCriarConta = () => {
     router.push("/criar-conta");
   };
 
@@ -34,12 +53,14 @@ export default function LoginScreen() {
       />
       <Input
         placeholder="Senha"
-        value={password}
-        onChangeText={setPassword}
+        value={senha}
+        onChangeText={setSenha}
         secureTextEntry
       />
-      <Button type="primary">Login</Button>
-      <Button type="secondary" onPress={handleSignUp}>
+      <Button type="primary" onPress={handleLogin}>
+        Login
+      </Button>
+      <Button type="secondary" onPress={handleCriarConta}>
         Criar conta
       </Button>
     </View>
@@ -53,6 +74,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#121214",
     display: "flex",
     gap: 15,
-    // justifyContent: "center",
   },
 });

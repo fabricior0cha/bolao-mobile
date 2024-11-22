@@ -23,5 +23,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     color: "#E1E1E6",
     fontSize: 16,
+    width: "100%",
   },
 });
