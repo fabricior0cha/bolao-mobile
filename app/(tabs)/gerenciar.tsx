@@ -8,11 +8,11 @@ import { Alert, StyleSheet } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
 function Gerenciar() {
-  const [boloes, setBoloes] = useState<Bolao[]>([]);
+  const [jogos, setJogos] = useState<Jogo[]>([]);
 
-  const handleGetBoloes = async () => {
-    axios.get("http://localhost:8080/api/boloes").then((resp) => {
-      setBoloes(resp.data);
+  const handleGetJogos = async () => {
+    axios.get("http://localhost:8080/api/jogos").then((resp) => {
+      setJogos(resp.data);
     });
   };
 
@@ -23,7 +23,7 @@ function Gerenciar() {
       })
       .then(() => {
         Alert.alert("Jogo atualizado com sucesso!");
-        handleGetBoloes();
+        handleGetJogos();
       })
       .catch((error) => {
         Alert.alert(error.response.data.message);
@@ -32,16 +32,16 @@ function Gerenciar() {
 
   useFocusEffect(
     useCallback(() => {
-      handleGetBoloes();
+      handleGetJogos();
     }, [])
   );
 
   return (
     <ScrollView style={styles.container}>
-      {boloes.map((bolao) => (
+      {jogos.map((jogo) => (
         <PoolCard
-          key={bolao.id}
-          bolao={bolao}
+          key={jogo.id}
+          jogo={jogo}
           handleUpdateJogo={handleUpdateJogo}
         />
       ))}

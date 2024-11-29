@@ -11,17 +11,15 @@ function Palpites() {
   const [palpites, setPalpites] = React.useState<Palpite[]>([]);
 
   const handleDeletePalpite = (id: number) => {
-    axios
-      .delete(`http://localhost:8080/api/palpites?idParticipante=${id}`)
-      .then(() => {
-        Alert.alert("Palpite deletado com sucesso!");
-        handleGetPalpites();
-      });
+    axios.delete(`http://localhost:8080/api/palpites?id=${id}`).then(() => {
+      Alert.alert("Palpite deletado com sucesso!");
+      handleGetPalpites();
+    });
   };
 
   const handleGetPalpites = async () => {
     axios
-      .get(`http://localhost:8080/api/palpites?idUsuario=${usuario?.id}`)
+      .get(`http://localhost:8080/api/palpites?idParticipante=${1}`)
       .then((resp) => {
         setPalpites(resp.data);
       });
@@ -35,8 +33,8 @@ function Palpites() {
     axios
       .put("http://localhost:8080/api/palpites", {
         id: palpite.id,
-        idUsuario: usuario?.id,
-        idBolao: palpite.bolao.id,
+        idParticipante: palpite.participante.id,
+        idJogo: palpite.jogo.id,
         resultadoTimeUm: resultadoTimeUm,
         resultadoTimeDois: resultadoTimeDois,
       })

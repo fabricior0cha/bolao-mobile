@@ -1,16 +1,30 @@
 import Button from "@/components/Button";
 import { useUsuarioContext } from "@/components/Context";
+import CupomCard from "@/components/CupomCard";
 import Input from "@/components/Input";
+import { Cupom } from "@/models/Cupom";
 import axios from "axios";
 import { useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 
 function Perfil() {
-  const { usuario } = useUsuarioContext();
+  const { usuario, participante } = useUsuarioContext();
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [cupons, setCupons] = useState<Cupom[]>([]);
+
+  const handleGetCupons = async () => {
+    axios
+      .get(
+        `http://localhost:8080/api/resgates?idParticipante=${participante?.id}`
+      )
+      .then((resp) => {
+        setCupons(resp.data);
+      });
+  };
 
   const handleGetUsuario = async () => {
     axios
@@ -41,11 +55,14 @@ function Perfil() {
   useFocusEffect(
     useCallback(() => {
       handleGetUsuario();
+      if (usuario?.tipo.codigo == "PAR") {
+        handleGetCupons();
+      }
     }, [])
   );
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.form}>
         <Input placeholder="Nome" value={nome} onChangeText={setNome} />
         <Input placeholder="E-mail" value={email} onChangeText={setEmail} />
@@ -59,7 +76,15 @@ function Perfil() {
           Alterar
         </Button>
       </View>
-    </View>
+      {usuario?.tipo.codigo == "PAR" && (
+        <View style={styles.cupomContainer}>
+          <Text style={styles.text}>Meus cupons:</Text>
+          {cupons.map((cupom) => (
+            <CupomCard key={cupom.id} cupom={cupom} hasRewarded />
+          ))}
+        </View>
+      )}
+    </ScrollView>
   );
 }
 
@@ -74,7 +99,15 @@ const styles = StyleSheet.create({
   form: {
     display: "flex",
     gap: 15,
-    padding: 20,
+  },
+  cupomContainer: {
+    marginTop: 20,
+    display: "flex",
+  },
+  text: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
   },
 });
 

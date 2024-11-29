@@ -2,6 +2,7 @@ import Button from "@/components/Button";
 import DatePicker from "@/components/DatePicker";
 import Input from "@/components/Input";
 import Select from "@/components/Select";
+import { formatDateTime } from "@/constants/FormatData";
 import { Time } from "@/models/Time";
 import axios from "axios";
 import { useFocusEffect } from "expo-router";
@@ -9,11 +10,9 @@ import React, { useCallback, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 
 function CriarBolao() {
-  const [titulo, setTitulo] = useState("");
-  const [premio, setPremio] = useState("");
   const [timeUm, setTimeUm] = useState<Time | undefined>(undefined);
   const [timeDois, setTimeDois] = useState<Time | undefined>(undefined);
-  const [dataJogo, setDataJogo] = useState<Date | undefined>(new Date());
+  const [horario, setHorario] = useState<Date | undefined>(new Date());
   const [times, setTimes] = useState<Time[]>([]);
 
   const handleGetTimes = async () => {
@@ -24,15 +23,13 @@ function CriarBolao() {
 
   const handleCreateBolao = async () => {
     axios
-      .post("http://localhost:8080/api/boloes", {
-        titulo: titulo,
-        premio: premio,
-        dataJogo: dataJogo,
-        idTimeUm: timeUm?.id,
-        idTimeDois: timeDois?.id,
+      .post("http://localhost:8080/api/jogos", {
+        horario: formatDateTime(horario),
+        timeUm: timeUm,
+        timeDois: timeDois,
       })
       .then(() => {
-        Alert.alert("Bolão criado com sucesso!");
+        Alert.alert("Jogo criado com sucesso!");
       })
       .catch((error) => {
         Alert.alert(error.response.data.message);
@@ -41,10 +38,8 @@ function CriarBolao() {
 
   useFocusEffect(
     useCallback(() => {
-      setTitulo("");
       handleGetTimes();
-      setDataJogo(new Date());
-      setPremio("");
+      setHorario(new Date());
       setTimeUm(undefined);
       setTimeDois(undefined);
     }, [])
@@ -53,11 +48,9 @@ function CriarBolao() {
   return (
     <View style={styles.container}>
       <View style={styles.form}>
-        <Input placeholder="Título" value={titulo} onChangeText={setTitulo} />
-        <Input placeholder="Prêmio" value={premio} onChangeText={setPremio} />
-
         <Select
           label="Time um"
+          value={timeUm?.id.toString()}
           options={times.map((time) => ({
             label: time.nome,
             value: time.id.toString(),
@@ -68,6 +61,7 @@ function CriarBolao() {
         />
         <Select
           label="Time dois"
+          value={timeDois?.id.toString()}
           options={times.map((time) => ({
             label: time.nome,
             value: time.id.toString(),
@@ -77,9 +71,9 @@ function CriarBolao() {
           }}
         />
         <DatePicker
-          placeholder="Data de encerramento"
-          value={dataJogo}
-          onChange={(date) => setDataJogo(date)}
+          placeholder="Horário do jogo"
+          value={horario}
+          onChange={(date) => setHorario(date)}
         />
         <Button type="primary" onPress={handleCreateBolao}>
           Criar

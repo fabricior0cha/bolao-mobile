@@ -11,38 +11,36 @@ import { Bolao } from "@/models/Bolao";
 import { useUsuarioContext } from "./Context";
 
 interface Props {
-  bolao: Bolao;
+  jogo: Jogo;
   handleCreatePalpite: ({
-    idUsuario,
-    idBolao,
+    idParticipante,
+    idJogo,
     resultadoTimeUm,
     resultadoTimeDois,
   }: {
-    idUsuario: number | undefined;
-    idBolao: number;
+    idParticipante: number | undefined;
+    idJogo: number;
     resultadoTimeUm: number;
     resultadoTimeDois: number;
   }) => void;
 }
-const MatchCard = ({ bolao, handleCreatePalpite }: Props) => {
+const MatchCard = ({ jogo, handleCreatePalpite }: Props) => {
   const { usuario } = useUsuarioContext();
   const [palpiteTimeUm, setPalpiteTimeUm] = useState("");
   const [palpiteTimeDois, setPalpiteTimeDois] = useState("");
 
   return (
     <View style={styles.card}>
-      <Text style={styles.date}>{bolao.titulo}</Text>
       <Text style={styles.date}>
-        Jogo: {moment(new Date(bolao.jogo.data)).format("DD/MM/yyyy")}
+        {jogo.timeUm.nome} X {jogo.timeDois.nome}
       </Text>
-      <Text style={styles.date}>Premio: R${bolao.premio}</Text>
+      <Text style={styles.date}>
+        Horário: {moment(new Date(jogo.horario)).format("DD/MM/yyyy HH:mm")}
+      </Text>
       <View style={styles.teamsContainer}>
         <View style={styles.team}>
-          {bolao.jogo.timeUm.codigo ? (
-            <Image
-              source={Emblemas[bolao.jogo.timeUm.codigo]}
-              style={styles.logo}
-            />
+          {jogo.timeUm.codigo ? (
+            <Image source={Emblemas[jogo.timeUm.codigo]} style={styles.logo} />
           ) : (
             ""
           )}
@@ -65,9 +63,9 @@ const MatchCard = ({ bolao, handleCreatePalpite }: Props) => {
           />
         </View>
         <View style={styles.team}>
-          {bolao.jogo.timeDois.codigo ? (
+          {jogo.timeDois.codigo ? (
             <Image
-              source={Emblemas[bolao.jogo.timeDois.codigo]}
+              source={Emblemas[jogo.timeDois.codigo]}
               style={styles.logo}
             />
           ) : (
@@ -80,8 +78,8 @@ const MatchCard = ({ bolao, handleCreatePalpite }: Props) => {
         type="primary"
         onPress={() =>
           handleCreatePalpite({
-            idUsuario: usuario?.id,
-            idBolao: bolao.id,
+            idParticipante: 1,
+            idJogo: jogo.id,
             resultadoTimeUm: parseInt(palpiteTimeUm),
             resultadoTimeDois: parseInt(palpiteTimeDois),
           })
@@ -132,6 +130,7 @@ const styles = StyleSheet.create({
     width: 65,
     height: 65,
     marginBottom: 10,
+    resizeMode: "contain",
   },
   teamName: {
     fontSize: 14,

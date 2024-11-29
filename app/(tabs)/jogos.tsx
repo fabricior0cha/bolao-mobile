@@ -1,5 +1,5 @@
 import MatchCard from "@/components/MatchCard";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Jogo } from "../../models/Jogo";
 import axios from "axios";
@@ -9,32 +9,32 @@ import { useUsuarioContext } from "@/components/Context";
 
 function Boloes() {
   const { usuario } = useUsuarioContext();
-  const [boloes, setBoloes] = React.useState<Bolao[]>([]);
+  const [jogos, setJogos] = useState<Jogo[]>([]);
   const handleGetJogos = async () => {
     axios
-      .get(`http://localhost:8080/api/boloes?idUsuario=${usuario?.id}`)
+      .get(`http://localhost:8080/api/jogos?idParticipante=${1}`)
       .then((resp) => {
-        setBoloes(resp.data);
+        setJogos(resp.data);
       });
   };
 
   const handleCreatePalpite = ({
-    idUsuario,
-    idBolao,
+    idParticipante,
+    idJogo,
     resultadoTimeUm,
     resultadoTimeDois,
   }: {
-    idUsuario: number | undefined;
-    idBolao: number;
+    idParticipante: number | undefined;
+    idJogo: number;
     resultadoTimeUm: number;
     resultadoTimeDois: number;
   }) => {
     axios
       .post("http://localhost:8080/api/palpites", {
-        idUsuario: idUsuario,
-        idBolao: idBolao,
-        resultadoTimeUm: resultadoTimeUm,
-        resultadoTimeDois: resultadoTimeDois,
+        idParticipante,
+        idJogo,
+        resultadoTimeUm,
+        resultadoTimeDois,
       })
       .then(() => {
         handleGetJogos();
@@ -53,10 +53,10 @@ function Boloes() {
 
   return (
     <ScrollView style={styles.container}>
-      {boloes.map((bolao) => (
+      {jogos.map((jogo) => (
         <MatchCard
-          key={bolao.id}
-          bolao={bolao}
+          key={jogo.id}
+          jogo={jogo}
           handleCreatePalpite={handleCreatePalpite}
         />
       ))}

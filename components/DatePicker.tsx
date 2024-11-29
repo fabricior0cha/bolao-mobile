@@ -10,11 +10,21 @@ type Props = {
 
 export default function DatePicker({ placeholder, value, onChange }: Props) {
   const [show, setShow] = useState(false);
+  const [mode, setMode] = useState<"date" | "time">("date");
 
-  const onDateChange = (event: any, selectedDate: Date | undefined) => {
-    setShow(false);
+  const onDateTimeChange = (event: any, selectedDate: Date | undefined) => {
     if (selectedDate) {
-      onChange(selectedDate);
+      if (mode === "date") {
+        setMode("time");
+        setShow(true);
+      } else {
+        setShow(false);
+        onChange(selectedDate);
+        setMode("date");
+      }
+    } else {
+      setShow(false);
+      setMode("date");
     }
   };
 
@@ -22,7 +32,7 @@ export default function DatePicker({ placeholder, value, onChange }: Props) {
     <View style={styles.container}>
       <TouchableOpacity style={styles.input} onPress={() => setShow(true)}>
         {value ? (
-          <Text style={styles.text}>{value.toLocaleDateString()}</Text>
+          <Text style={styles.text}>{value.toLocaleString()}</Text>
         ) : (
           <Text style={styles.placeholder}>{placeholder}</Text>
         )}
@@ -31,9 +41,9 @@ export default function DatePicker({ placeholder, value, onChange }: Props) {
       {show && (
         <DateTimePicker
           value={value || new Date()}
-          mode="date"
+          mode={mode}
           display="default"
-          onChange={onDateChange}
+          onChange={onDateTimeChange}
         />
       )}
     </View>

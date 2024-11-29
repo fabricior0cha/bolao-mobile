@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -11,10 +11,16 @@ import {
 type Props = {
   label: string;
   options: { label: string; value: string }[];
+  value: string | undefined;
   onValueChange: (value: string) => void;
 };
 
-export default function Select({ label, options, onValueChange }: Props) {
+export default function Select({
+  label,
+  options,
+  onValueChange,
+  value,
+}: Props) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string>(
     options[0]?.value || ""
@@ -25,6 +31,10 @@ export default function Select({ label, options, onValueChange }: Props) {
     onValueChange(value);
     setIsModalVisible(false);
   };
+
+  useEffect(() => {
+    setSelectedValue(value ?? "");
+  }, [value]);
 
   return (
     <View style={styles.container}>

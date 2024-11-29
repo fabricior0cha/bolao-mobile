@@ -27,7 +27,9 @@ export default function LoginScreen() {
       })
       .then((resp) => {
         setUsuario(resp.data);
-        router.push("/boloes");
+        resp.data.tipo.codigo == "PAR"
+          ? router.push("/jogos")
+          : router.push("/gerenciar");
       })
       .catch((error) => {
         Alert.alert(error.response.data.message);

@@ -9,32 +9,31 @@ import moment from "moment";
 import axios from "axios";
 import { Bolao } from "@/models/Bolao";
 import { Palpite } from "@/models/Palpite";
+import Info from "./Info";
 
 interface Props {
-  bolao: Bolao;
+  jogo: Jogo;
   handleUpdateJogo: (jogo: Jogo) => void;
 }
 
-const PoolCard = ({ bolao, handleUpdateJogo }: Props) => {
+const PoolCard = ({ jogo, handleUpdateJogo }: Props) => {
   const [isEdit, setIsEdit] = useState(false);
   const [resultadoTimeUm, setResultadoTimeUm] = useState("");
   const [resultadoTimeDois, setResultadoTimeDois] = useState("");
 
   return (
     <View style={styles.card}>
-      <Text style={styles.date}>{bolao.titulo}</Text>
       <Text style={styles.date}>
-        Jogo: {moment(bolao.jogo.data).format("DD/MM/yyyy")}
+        {jogo.timeUm.nome} X {jogo.timeDois.nome}
+      </Text>
+      <Text style={styles.date}>
+        Horário: {moment(new Date(jogo.horario)).format("DD/MM/yyyy HH:mm")}
       </Text>
 
-      <Text style={styles.date}>Premio do bolão: R${bolao.premio}</Text>
       <View style={styles.teamsContainer}>
         <View style={styles.team}>
-          {bolao.jogo.timeUm.codigo ? (
-            <Image
-              source={Emblemas[bolao.jogo.timeUm.codigo]}
-              style={styles.logo}
-            />
+          {jogo.timeUm.codigo ? (
+            <Image source={Emblemas[jogo.timeUm.codigo]} style={styles.logo} />
           ) : (
             ""
           )}
@@ -48,7 +47,7 @@ const PoolCard = ({ bolao, handleUpdateJogo }: Props) => {
               maxLength={1}
             />
           ) : (
-            <Text style={styles.date}>{bolao.jogo.totalTimeUm ?? "-"}</Text>
+            <Text style={styles.date}>{jogo.totalTimeUm ?? "-"}</Text>
           )}
         </View>
         <Text style={styles.vs}>VS</Text>
@@ -61,13 +60,13 @@ const PoolCard = ({ bolao, handleUpdateJogo }: Props) => {
               maxLength={1}
             />
           ) : (
-            <Text style={styles.date}>{bolao.jogo.totalTimeDois ?? "-"}</Text>
+            <Text style={styles.date}>{jogo.totalTimeDois ?? "-"}</Text>
           )}
         </View>
         <View style={styles.team}>
-          {bolao.jogo.timeDois.codigo ? (
+          {jogo.timeDois.codigo ? (
             <Image
-              source={Emblemas[bolao.jogo.timeDois.codigo]}
+              source={Emblemas[jogo.timeDois.codigo]}
               style={styles.logo}
             />
           ) : (
@@ -76,40 +75,64 @@ const PoolCard = ({ bolao, handleUpdateJogo }: Props) => {
         </View>
       </View>
 
-      {bolao.jogo.totalTimeUm >= 0 && bolao.jogo.totalTimeDois >= 0 ? (
-        <Text style={styles.date}>Bolão encerrado</Text>
-      ) : (
-        <View style={styles.buttonContainer}>
-          {isEdit ? (
-            <>
-              <Button
-                type="primary"
-                onPress={() => {
-                  handleUpdateJogo({
-                    ...bolao.jogo,
-                    totalTimeUm: parseInt(resultadoTimeUm),
-                    totalTimeDois: parseInt(resultadoTimeDois),
-                  });
-                  setIsEdit(false);
-                  setResultadoTimeUm("");
-                  setResultadoTimeDois("");
-                }}
-              >
-                Confirmar
-              </Button>
-              <Button type="danger" onPress={() => setIsEdit(false)}>
-                Cancelar
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button type="danger" onPress={() => setIsEdit(true)}>
-                Encerrar bolão
-              </Button>
-            </>
-          )}
+      {/* Jogo ainda não começou, ainda não chegou 15 minutos antes da hora */}
+      {moment().isBefore(moment(jogo.horario).subtract(15, "minutes")) && (
+        <View>
+          <Info>Jogo ainda não começou, aguarde para encerrar!</Info>
         </View>
       )}
+
+      {/* Jogo em andamento, ainda não passou 100 minutos do jogo */}
+
+      {moment().isBetween(
+        moment(jogo.horario).subtract(15, "minutes"),
+        moment(jogo.horario).add(100, "minutes")
+      ) && (
+        <View>
+          <Info>Jogo em andamento no momento, aguarde para encerrar!</Info>
+        </View>
+      )}
+
+      {/* Passou 100 minutos do jogo habilitar encerramento */}
+      {moment().isAfter(moment(jogo.horario).add(100, "minutes")) &&
+        jogo.totalTimeUm == null &&
+        jogo.totalTimeDois == null && (
+          <View style={styles.buttonContainer}>
+            {isEdit ? (
+              <>
+                <Button
+                  type="primary"
+                  onPress={() => {
+                    handleUpdateJogo({
+                      ...jogo,
+                      totalTimeUm: parseInt(resultadoTimeUm),
+                      totalTimeDois: parseInt(resultadoTimeDois),
+                    });
+                    setIsEdit(false);
+                    setResultadoTimeUm("");
+                    setResultadoTimeDois("");
+                  }}
+                >
+                  Confirmar
+                </Button>
+                <Button type="danger" onPress={() => setIsEdit(false)}>
+                  Cancelar
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button type="danger" onPress={() => setIsEdit(true)}>
+                  Encerrar
+                </Button>
+              </>
+            )}
+          </View>
+        )}
+
+      {/* Jogo finalizado e possui resultado */}
+      {moment().isAfter(moment(jogo.horario).add(100, "minutes")) &&
+        jogo.totalTimeUm != null &&
+        jogo.totalTimeDois != null && <Info>Jogo já encerrado!</Info>}
     </View>
   );
 };
@@ -153,6 +176,7 @@ const styles = StyleSheet.create({
     width: 65,
     height: 65,
     marginBottom: 10,
+    resizeMode: "contain",
   },
   teamName: {
     fontSize: 14,
@@ -170,6 +194,12 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     gap: 10,
     width: "100%",
+  },
+  text: {
+    color: Colors.text.primary,
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 

@@ -1,6 +1,13 @@
 import { Colors } from "@/constants/Colors";
-import React, { useState } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Animated,
+} from "react-native";
 import Button from "./Button";
 import { Jogo } from "@/models/Jogo";
 import { Emblemas } from "@/constants/Emblemas";
@@ -9,6 +16,7 @@ import moment from "moment";
 import axios from "axios";
 import { Bolao } from "@/models/Bolao";
 import { Palpite } from "@/models/Palpite";
+import Info from "./Info";
 
 interface Props {
   palpite: Palpite;
@@ -28,20 +36,42 @@ const GuessCard = ({
   const [palpiteTimeUm, setPalpiteTimeUm] = useState("");
   const [palpiteTimeDois, setPalpiteTimeDois] = useState("");
   const [isEdit, setIsEdit] = useState(false);
+  const [opacity] = useState(new Animated.Value(1));
+
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    animation.start();
+    return () => animation.stop(); // Para a animação quando o componente desmontar
+  }, [opacity]);
 
   return (
     <View style={styles.card}>
-      <Text style={styles.date}>{palpite.bolao.titulo}</Text>
       <Text style={styles.date}>
-        Jogo: {moment(palpite.bolao.jogo.data).format("DD/MM/yyyy")}
+        {palpite.jogo.timeUm.nome} X {palpite.jogo.timeDois.nome}
+      </Text>
+      <Text style={styles.date}>
+        Horário:{" "}
+        {moment(new Date(palpite.jogo.horario)).format("DD/MM/yyyy HH:mm")}
       </Text>
 
-      <Text style={styles.date}>Premio do bolão: R${palpite.bolao.premio}</Text>
       <View style={styles.teamsContainer}>
         <View style={styles.team}>
-          {palpite.bolao.jogo.timeUm.codigo ? (
+          {palpite.jogo.timeUm.codigo ? (
             <Image
-              source={Emblemas[palpite.bolao.jogo.timeUm.codigo]}
+              source={Emblemas[palpite.jogo.timeUm.codigo]}
               style={styles.logo}
             />
           ) : (
@@ -74,9 +104,9 @@ const GuessCard = ({
           )}
         </View>
         <View style={styles.team}>
-          {palpite.bolao.jogo.timeDois.codigo ? (
+          {palpite.jogo.timeDois.codigo ? (
             <Image
-              source={Emblemas[palpite.bolao.jogo.timeDois.codigo]}
+              source={Emblemas[palpite.jogo.timeDois.codigo]}
               style={styles.logo}
             />
           ) : (
@@ -85,20 +115,50 @@ const GuessCard = ({
         </View>
       </View>
 
-      {palpite.bolao.jogo.totalTimeUm >= 0 &&
-      palpite.bolao.jogo.totalTimeDois >= 0 ? (
-        <>
-          <Text style={styles.date}>
-            Jogo encerrado ({palpite.bolao.jogo.totalTimeUm} x{" "}
-            {palpite.bolao.jogo.totalTimeDois})
+      {moment().isBetween(
+        moment(palpite.jogo.horario).subtract(15, "minutes"),
+        moment(palpite.jogo.horario).add(90, "minutes")
+      ) && (
+        <View style={styles.inProgressContainer}>
+          <Animated.View style={[styles.dot, { opacity }]} />
+          <Text style={styles.text}>Jogo em andamento</Text>
+        </View>
+      )}
+
+      {moment().isAfter(moment(palpite.jogo.horario).add(90, "minutes")) &&
+        palpite.jogo.totalTimeUm == null &&
+        palpite.jogo.totalTimeDois == null && (
+          <Text style={styles.text}>Jogo finalizado! Aguarde o resultado.</Text>
+        )}
+
+      {palpite.jogo.totalTimeUm != null &&
+        palpite.jogo.totalTimeDois != null && (
+          <Text style={styles.text}>
+            Resultado final: {palpite.jogo.totalTimeUm} X{" "}
+            {palpite.jogo.totalTimeDois}
           </Text>
-          <Text style={styles.date}>
-            {palpite.participante.vencedor
-              ? "Palpite correto! Retire seu prêmio"
-              : "Palpite incorreto! Tente novamente"}
-          </Text>
-        </>
-      ) : (
+        )}
+
+      {moment().isAfter(moment(palpite.jogo.horario).add(90, "minutes")) &&
+        palpite.jogo.totalTimeUm != null &&
+        palpite.jogo.totalTimeDois != null &&
+        (palpite.resultadoTimeUm === palpite.jogo.totalTimeUm &&
+        palpite.resultadoTimeDois === palpite.jogo.totalTimeDois ? (
+          <Info>Você acertou o palpite! +45 pontos</Info>
+        ) : (palpite.resultadoTimeUm > palpite.resultadoTimeDois &&
+            palpite.jogo.totalTimeUm > palpite.jogo.totalTimeDois) ||
+          (palpite.resultadoTimeUm < palpite.resultadoTimeDois &&
+            palpite.jogo.totalTimeUm < palpite.jogo.totalTimeDois) ||
+          (palpite.resultadoTimeUm === palpite.resultadoTimeDois &&
+            palpite.jogo.totalTimeUm === palpite.jogo.totalTimeDois) ? (
+          <Info>Você acertou o vencedor! +15 pontos</Info>
+        ) : (
+          <Info>Você errou o palpite! +0 pontos</Info>
+        ))}
+
+      {moment().isBefore(
+        moment(palpite.jogo.horario).subtract(15, "minutes")
+      ) && (
         <View style={styles.buttonContainer}>
           {isEdit ? (
             <>
@@ -128,7 +188,7 @@ const GuessCard = ({
               </Button>
               <Button
                 type="danger"
-                onPress={() => handleDeletePalpite(palpite.participante.id)}
+                onPress={() => handleDeletePalpite(palpite.id)}
               >
                 REMOVER
               </Button>
@@ -165,6 +225,11 @@ const styles = StyleSheet.create({
     color: Colors.text.primary,
     marginBottom: 20,
   },
+  text: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: Colors.text.primary,
+  },
   teamsContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -179,6 +244,7 @@ const styles = StyleSheet.create({
     width: 65,
     height: 65,
     marginBottom: 10,
+    resizeMode: "contain",
   },
   teamName: {
     fontSize: 14,
@@ -196,6 +262,17 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     gap: 10,
     width: "100%",
+  },
+  inProgressContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "red",
+    marginRight: 5,
   },
 });
 
