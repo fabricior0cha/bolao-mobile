@@ -11,6 +11,7 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import Button from "./Button";
 import { Cupom } from "@/models/Cupom";
+import moment from "moment";
 
 type Props = {
   cupom: Cupom;
@@ -52,22 +53,24 @@ export default function CupomCard({
           <Text style={styles.storeName}>{cupom.loja.nome}</Text>
           <Text style={styles.discount}>{cupom.desconto}% OFF</Text>
           <Text style={styles.validity}>
-            Válido até {cupom.dataVencimento.toString()}
+            Válido até {moment(cupom.dataVencimento).format("DD/MM/YYYY")}
           </Text>
         </View>
       </View>
 
       <View style={styles.buttonContainer}>
-        {!isRewarded && !allowRewarded && (
-          <Button
-            type="primary"
-            onPress={() => {
-              setAllowRewarded(true);
-            }}
-          >
-            Resgatar por {cupom.pontos} pontos
-          </Button>
-        )}
+        {!isRewarded &&
+          !allowRewarded &&
+          moment().isBefore(cupom.dataVencimento) && (
+            <Button
+              type="primary"
+              onPress={() => {
+                setAllowRewarded(true);
+              }}
+            >
+              Resgatar por {cupom.pontos} pontos
+            </Button>
+          )}
         {allowRewarded && (
           <>
             <Button
@@ -90,7 +93,7 @@ export default function CupomCard({
           </>
         )}
       </View>
-      {isRewarded && (
+      {isRewarded && moment().isBefore(cupom.dataVencimento) && (
         <View style={styles.containerCupom}>
           <Text style={styles.text}>#ABC123</Text>
           <TouchableOpacity
@@ -103,6 +106,11 @@ export default function CupomCard({
               color={Colors.text.primary}
             />
           </TouchableOpacity>
+        </View>
+      )}
+      {moment().isAfter(cupom.dataVencimento) && (
+        <View style={styles.containerCupom}>
+          <Text style={styles.text}>Cupom expirado!</Text>
         </View>
       )}
     </View>
