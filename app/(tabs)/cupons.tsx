@@ -1,5 +1,6 @@
 import { useUsuarioContext } from "@/components/Context";
 import CupomCard from "@/components/CupomCard";
+import { API_URL } from "@/constants/Api";
 import { Cupom } from "@/models/Cupom";
 import axios from "axios";
 import { useFocusEffect } from "expo-router";
@@ -12,9 +13,7 @@ function Cupons() {
 
   const handleGetCupons = async () => {
     axios
-      .get(
-        `http://localhost:8080/api/cupons?idParticipante=${participante?.id}`
-      )
+      .get(`${API_URL}/cupons?idParticipante=${participante?.id}`)
       .then((resp) => {
         setCupons(resp.data);
       });
@@ -22,7 +21,7 @@ function Cupons() {
 
   const handleReward = async (idCupom: number) => {
     axios
-      .post("http://localhost:8080/api/cupons", {
+      .post(`${API_URL}/cupons`, {
         idParticipante: participante?.id,
         idCupom,
       })

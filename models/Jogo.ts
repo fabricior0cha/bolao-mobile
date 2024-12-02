@@ -1,4 +1,3 @@
-import { Bolao } from "./Bolao";
 import { Time } from "./Time";
 
 export interface Jogo {

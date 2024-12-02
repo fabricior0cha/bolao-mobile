@@ -1,5 +1,6 @@
 import { useUsuarioContext } from "@/components/Context";
 import GuessCard from "@/components/GuessCard";
+import { API_URL } from "@/constants/Api";
 import { Palpite } from "@/models/Palpite";
 import axios from "axios";
 import { useFocusEffect } from "expo-router";
@@ -7,11 +8,11 @@ import React, { useCallback } from "react";
 import { Alert, ScrollView, StyleSheet } from "react-native";
 
 function Palpites() {
-  const { usuario } = useUsuarioContext();
+  const { usuario, participante } = useUsuarioContext();
   const [palpites, setPalpites] = React.useState<Palpite[]>([]);
 
   const handleDeletePalpite = (id: number) => {
-    axios.delete(`http://localhost:8080/api/palpites?id=${id}`).then(() => {
+    axios.delete(`${API_URL}/palpites?id=${id}`).then(() => {
       Alert.alert("Palpite deletado com sucesso!");
       handleGetPalpites();
     });
@@ -19,7 +20,7 @@ function Palpites() {
 
   const handleGetPalpites = async () => {
     axios
-      .get(`http://localhost:8080/api/palpites?idParticipante=${1}`)
+      .get(`${API_URL}/palpites?idParticipante=${participante?.id}`)
       .then((resp) => {
         setPalpites(resp.data);
       });
@@ -31,7 +32,7 @@ function Palpites() {
     resultadoTimeDois: number
   ) => {
     axios
-      .put("http://localhost:8080/api/palpites", {
+      .put(`${API_URL}/palpites`, {
         id: palpite.id,
         idParticipante: palpite.participante.id,
         idJogo: palpite.jogo.id,

@@ -1,5 +1,5 @@
 import PoolCard from "@/components/PoolCard";
-import { Bolao } from "@/models/Bolao";
+import { API_URL } from "@/constants/Api";
 import { Jogo } from "@/models/Jogo";
 import axios from "axios";
 import { useFocusEffect } from "expo-router";
@@ -11,14 +11,14 @@ function Gerenciar() {
   const [jogos, setJogos] = useState<Jogo[]>([]);
 
   const handleGetJogos = async () => {
-    axios.get("http://localhost:8080/api/jogos").then((resp) => {
+    axios.get(`${API_URL}/jogos`).then((resp) => {
       setJogos(resp.data);
     });
   };
 
   const handleUpdateJogo = async (jogo: Jogo) => {
     axios
-      .put("http://localhost:8080/api/jogos", {
+      .put(`${API_URL}/jogos`, {
         ...jogo,
       })
       .then(() => {

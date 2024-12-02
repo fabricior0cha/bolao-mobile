@@ -1,14 +1,12 @@
 import { Colors } from "@/constants/Colors";
-import React, { useState } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import Button from "./Button";
-import { Jogo } from "@/models/Jogo";
 import { Emblemas } from "@/constants/Emblemas";
-import Input from "./Input";
+import { Jogo } from "@/models/Jogo";
 import moment from "moment";
-import axios from "axios";
-import { Bolao } from "@/models/Bolao";
+import React, { useState } from "react";
+import { Image, StyleSheet, Text, View } from "react-native";
+import Button from "./Button";
 import { useUsuarioContext } from "./Context";
+import Input from "./Input";
 
 interface Props {
   jogo: Jogo;
@@ -25,7 +23,7 @@ interface Props {
   }) => void;
 }
 const MatchCard = ({ jogo, handleCreatePalpite }: Props) => {
-  const { usuario } = useUsuarioContext();
+  const { participante } = useUsuarioContext();
   const [palpiteTimeUm, setPalpiteTimeUm] = useState("");
   const [palpiteTimeDois, setPalpiteTimeDois] = useState("");
 
@@ -78,7 +76,7 @@ const MatchCard = ({ jogo, handleCreatePalpite }: Props) => {
         type="primary"
         onPress={() =>
           handleCreatePalpite({
-            idParticipante: 1,
+            idParticipante: participante?.id,
             idJogo: jogo.id,
             resultadoTimeUm: parseInt(palpiteTimeUm),
             resultadoTimeDois: parseInt(palpiteTimeDois),

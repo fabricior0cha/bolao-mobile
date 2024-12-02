@@ -1,15 +1,12 @@
 import { Colors } from "@/constants/Colors";
-import React, { useState } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import Button from "./Button";
-import { Jogo } from "@/models/Jogo";
 import { Emblemas } from "@/constants/Emblemas";
-import Input from "./Input";
+import { Jogo } from "@/models/Jogo";
 import moment from "moment";
-import axios from "axios";
-import { Bolao } from "@/models/Bolao";
-import { Palpite } from "@/models/Palpite";
+import React, { useState } from "react";
+import { Image, StyleSheet, Text, View } from "react-native";
+import Button from "./Button";
 import Info from "./Info";
+import Input from "./Input";
 
 interface Props {
   jogo: Jogo;

@@ -2,6 +2,7 @@ import Button from "@/components/Button";
 import { useUsuarioContext } from "@/components/Context";
 import CupomCard from "@/components/CupomCard";
 import Input from "@/components/Input";
+import { API_URL } from "@/constants/Api";
 import { Cupom } from "@/models/Cupom";
 import axios from "axios";
 import { useFocusEffect } from "expo-router";
@@ -18,27 +19,23 @@ function Perfil() {
 
   const handleGetCupons = async () => {
     axios
-      .get(
-        `http://localhost:8080/api/resgates?idParticipante=${participante?.id}`
-      )
+      .get(`${API_URL}/resgates?idParticipante=${participante?.id}`)
       .then((resp) => {
         setCupons(resp.data);
       });
   };
 
   const handleGetUsuario = async () => {
-    axios
-      .get(`http://localhost:8080/api/usuarios/${usuario?.id}`)
-      .then((resp) => {
-        setNome(resp.data.nome);
-        setEmail(resp.data.email);
-        setSenha(resp.data.senha ?? "");
-      });
+    axios.get(`${API_URL}/usuarios/${usuario?.id}`).then((resp) => {
+      setNome(resp.data.nome);
+      setEmail(resp.data.email);
+      setSenha(resp.data.senha ?? "");
+    });
   };
 
   const handleUpdateUsuario = async () => {
     axios
-      .put(`http://localhost:8080/api/usuarios`, {
+      .put(`${API_URL}/usuarios`, {
         id: usuario?.id,
         nome,
         email,

@@ -14,6 +14,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import axios from "axios";
+import { API_URL } from "@/constants/Api";
 
 export default function CriarContaScreen() {
   const [nome, setNome] = useState("");
@@ -26,7 +27,7 @@ export default function CriarContaScreen() {
 
   const handleCreateAccount = async () => {
     axios
-      .post("http://192.168.1.103:8080/api/usuarios", {
+      .post(`${API_URL}/api/usuarios`, {
         nome,
         email,
         senha,

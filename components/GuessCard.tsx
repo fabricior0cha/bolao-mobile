@@ -1,22 +1,12 @@
 import { Colors } from "@/constants/Colors";
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  Animated,
-} from "react-native";
-import Button from "./Button";
-import { Jogo } from "@/models/Jogo";
 import { Emblemas } from "@/constants/Emblemas";
-import Input from "./Input";
-import moment from "moment";
-import axios from "axios";
-import { Bolao } from "@/models/Bolao";
 import { Palpite } from "@/models/Palpite";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
+import { Animated, Image, StyleSheet, Text, View } from "react-native";
+import Button from "./Button";
 import Info from "./Info";
+import Input from "./Input";
 
 interface Props {
   palpite: Palpite;

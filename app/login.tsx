@@ -1,6 +1,7 @@
 import Button from "@/components/Button";
 import { useUsuarioContext } from "@/components/Context";
 import Input from "@/components/Input";
+import { API_URL } from "@/constants/Api";
 import axios from "axios";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -21,7 +22,7 @@ export default function LoginScreen() {
 
   const handleLogin = () => {
     axios
-      .post("http://localhost:8080/api/login", {
+      .post(`${API_URL}/login`, {
         email,
         senha,
       })

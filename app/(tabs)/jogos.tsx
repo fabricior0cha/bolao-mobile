@@ -1,18 +1,19 @@
-import MatchCard from "@/components/MatchCard";
-import React, { useCallback, useEffect, useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
-import { Jogo } from "../../models/Jogo";
-import axios from "axios";
-import { Bolao } from "@/models/Bolao";
-import { useFocusEffect } from "expo-router";
 import { useUsuarioContext } from "@/components/Context";
+import MatchCard from "@/components/MatchCard";
+import { API_URL } from "@/constants/Api";
+import axios from "axios";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useState } from "react";
+import { Alert, ScrollView, StyleSheet } from "react-native";
+import { Jogo } from "../../models/Jogo";
 
 function Boloes() {
-  const { usuario } = useUsuarioContext();
+  const { participante } = useUsuarioContext();
   const [jogos, setJogos] = useState<Jogo[]>([]);
+
   const handleGetJogos = async () => {
     axios
-      .get(`http://localhost:8080/api/jogos?idParticipante=${1}`)
+      .get(`${API_URL}/jogos?idParticipante=${participante?.id}`)
       .then((resp) => {
         setJogos(resp.data);
       });
@@ -30,7 +31,7 @@ function Boloes() {
     resultadoTimeDois: number;
   }) => {
     axios
-      .post("http://localhost:8080/api/palpites", {
+      .post(`${API_URL}/palpites`, {
         idParticipante,
         idJogo,
         resultadoTimeUm,
@@ -47,8 +48,8 @@ function Boloes() {
 
   useFocusEffect(
     useCallback(() => {
-      handleGetJogos();
-    }, [])
+      if (participante?.id) handleGetJogos();
+    }, [participante])
   );
 
   return (

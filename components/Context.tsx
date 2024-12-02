@@ -1,3 +1,4 @@
+import { API_URL } from "@/constants/Api";
 import { Participante } from "@/models/Participante";
 import { Usuario } from "@/models/Usuario";
 import axios from "axios";
@@ -25,7 +26,7 @@ export const ContextProvider = ({ children }: PropsWithChildren) => {
 
   const handleGetParticipante = () => {
     axios
-      .get(`http://localhost:8080/api/participantes?idUsuario=${usuario?.id}`)
+      .get(`${API_URL}/participantes?idUsuario=${usuario?.id}`)
       .then((resp) => {
         setParticipante(resp.data);
       });

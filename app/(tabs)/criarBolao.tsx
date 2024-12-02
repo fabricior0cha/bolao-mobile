@@ -2,6 +2,7 @@ import Button from "@/components/Button";
 import DatePicker from "@/components/DatePicker";
 import Input from "@/components/Input";
 import Select from "@/components/Select";
+import { API_URL } from "@/constants/Api";
 import { formatDateTime } from "@/constants/FormatData";
 import { Time } from "@/models/Time";
 import axios from "axios";
@@ -16,14 +17,14 @@ function CriarBolao() {
   const [times, setTimes] = useState<Time[]>([]);
 
   const handleGetTimes = async () => {
-    axios.get("http://localhost:8080/api/times").then((resp) => {
+    axios.get(`${API_URL}/times`).then((resp) => {
       setTimes(resp.data);
     });
   };
 
   const handleCreateBolao = async () => {
     axios
-      .post("http://localhost:8080/api/jogos", {
+      .post(`${API_URL}/jogos`, {
         horario: formatDateTime(horario),
         timeUm: timeUm,
         timeDois: timeDois,
